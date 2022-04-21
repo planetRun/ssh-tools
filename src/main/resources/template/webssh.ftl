@@ -6,38 +6,17 @@
 </head>
 <body>
 <div id="terminal" style="width: 100%;height: 100%"></div>
-
+<input type="hidden" value="${ipnet}" name="ipnet">
 <script src="../js/jquery-3.4.1.min.js"></script>
 <script src="../js/xterm.js" charset="utf-8"></script>
 <script src="../js/webssh.js" charset="utf-8"></script>
 <script>
-
-    function getParam() {
-        let url = window.location.href;//http://localhost:3000/edu/edu_teacher?type=2&a=3
-        if(url.indexOf('?') != -1){
-            let obj = {};
-            let arr = url.slice(url.indexOf('?')+1).split('&');
-            arr.forEach(item => {
-                let param = item.split('=');
-                obj[param[0]] = param[1];
-            })
-            console.log(obj);
-            return obj;
-        }else {
-            console.log('没有参数');
-            alert('没有参数');
-            return null;
-        }
-    }
-    var obj = getParam();
-    let pwd = obj.encrypt;
-    console.log(obj, pwd)
     openTerminal( {
         operate:'connect',
-        host: obj.ipnet,//IP
-        port: obj.port,//端口号
+        host: '${ipnet}',//IP
+        port: '${port}',//端口号
         username: 'root',//用户名
-        password: pwd //密码
+        password: '${password}'//密码
     });
     function openTerminal(options){
         var client = new WSSHClient();

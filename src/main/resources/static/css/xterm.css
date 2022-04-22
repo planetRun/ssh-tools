@@ -2259,3 +2259,14 @@
 .terminal .xterm-bg-color-255 {
     background-color: #eeeeee;
 }
+
+.drop-file {
+    background-color: #000;
+    color: #fff;
+    font-family: courier-new, courier, monospace;
+    font-feature-settings: "liga" 0;
+    position: relative;
+    user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+}

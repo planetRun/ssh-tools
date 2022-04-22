@@ -4,20 +4,21 @@ import cn.objectspace.webssh.constant.ConstantPool;
 import cn.objectspace.webssh.pojo.SSHConnectInfo;
 import cn.objectspace.webssh.pojo.WebSSHData;
 import cn.objectspace.webssh.service.WebSSHService;
+import cn.objectspace.webssh.service.WebSftpService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
+import com.jcraft.jsch.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Base64Utils;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
@@ -38,6 +39,9 @@ public class WebSSHServiceImpl implements WebSSHService {
     private Logger logger = LoggerFactory.getLogger(WebSSHServiceImpl.class);
     //线程池
     private ExecutorService executorService = Executors.newCachedThreadPool();
+
+    @Autowired
+    private WebSftpService webSftpService;
 
     /**
      * @Description: 初始化连接
@@ -85,11 +89,19 @@ public class WebSSHServiceImpl implements WebSSHService {
                 @Override
                 public void run() {
                     try {
+                        sshConnectInfo.setWebSSHData(finalWebSSHData);
                         connectToSSH(sshConnectInfo, finalWebSSHData, session);
                     } catch (JSchException | IOException e) {
                         logger.error("webssh连接异常");
                         logger.error("异常信息:{}", e.getMessage());
                         close(session);
+                    }
+                    try {
+                        Channel channel = webSftpService.connectToFtpSSH(sshConnectInfo, finalWebSSHData);
+                        channel.disconnect();
+                    } catch (Exception e) {
+                        logger.error("webssh连接异常");
+                        logger.error("异常信息:{}", e.getMessage());
                     }
                 }
             });
@@ -98,8 +110,14 @@ public class WebSSHServiceImpl implements WebSSHService {
             SSHConnectInfo sshConnectInfo = (SSHConnectInfo) sshMap.get(userId);
             if (sshConnectInfo != null) {
                 try {
-                    transToSSH(sshConnectInfo.getChannel(), command);
-                } catch (IOException e) {
+                    // 文件上传命令
+                    if (command.startsWith("\rfile")) {
+                        ChannelSftp channel = webSftpService.connectToFtpSSH(sshConnectInfo, sshConnectInfo.getWebSSHData());
+                        webSftpService.writeFile(command, "/home", channel);
+                    } else {
+                        transToSSH(sshConnectInfo.getChannel(), command);
+                    }
+                } catch (IOException | JSchException e) {
                     logger.error("webssh连接异常");
                     logger.error("异常信息:{}", e.getMessage());
                     close(session);
@@ -143,7 +161,7 @@ public class WebSSHServiceImpl implements WebSSHService {
         session = sshConnectInfo.getjSch().getSession(webSSHData.getUsername(), webSSHData.getHost(), webSSHData.getPort());
         session.setConfig(config);
         //设置密码
-        session.setPassword(webSSHData.getPassword());
+        session.setPassword(Base64Utils.decode(webSSHData.getPassword().getBytes(StandardCharsets.UTF_8)));
         //连接  超时时间30s
         session.connect(30000);
 

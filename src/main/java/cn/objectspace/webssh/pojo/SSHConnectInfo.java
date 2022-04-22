@@ -13,6 +13,28 @@ public class SSHConnectInfo {
     private JSch jSch;
     private Channel channel;
 
+    /**
+     * 当前文件夹路径  上传文件用
+     */
+    private String curDirPath;
+
+    private WebSSHData webSSHData;
+
+    public String getCurDirPath() {
+        return curDirPath;
+    }
+
+    public void setCurDirPath(String curDirPath) {
+        this.curDirPath = curDirPath;
+    }
+
+    public WebSSHData getWebSSHData() {
+        return webSSHData;
+    }
+
+    public void setWebSSHData(WebSSHData webSSHData) {
+        this.webSSHData = webSSHData;
+    }
 
     public WebSocketSession getWebSocketSession() {
         return webSocketSession;

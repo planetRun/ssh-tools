@@ -29,25 +29,36 @@ $("#terminal").on({
         //将获取的文件信息替换到input的自带属性的files中
         $("#file").prop("files",file[0]);
 
-        // 向 FormData 中追加文件
-        var fd = new FormData()
-        fd.append('files', file[0]);
+        layer.confirm('确定要上传文件['+file[0].name+']吗？', {
+            btn : ['确定', '取消']
+            // 按钮
+        }, function(index) {
+            // 向 FormData 中追加文件
+            var fd = new FormData()
+            fd.append('files', file[0]);
 
-        if (dropClient) {
-            $.ajax({
-                method: 'POST',
-                url: '/api/upload/files',
-                data: fd,
-                // 不修改 Content-Type 属性，使用 FormData 默认的 Content-Type 值
-                contentType: false,
-                // 不对 FormData 中的数据进行 url 编码，而是将 FormData 数据原样发送到服务器
-                processData: false,
-                success: function(res) {
-                    console.log(res);
-                    callback(res);
-                }
-            })
-        }
+            if (dropClient) {
+                $.ajax({
+                    method: 'POST',
+                    url: '/api/upload/files',
+                    data: fd,
+                    // 不修改 Content-Type 属性，使用 FormData 默认的 Content-Type 值
+                    contentType: false,
+                    // 不对 FormData 中的数据进行 url 编码，而是将 FormData 数据原样发送到服务器
+                    processData: false,
+                    success: function(res) {
+                        console.log(res);
+                        callback(res);
+                        layer.close(index)
+                    }
+                })
+            }
+        }, function (index) {
+            //close
+            console.log('关闭')
+            layer.close(index)
+        });
+
 
 
 

@@ -18,6 +18,8 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
@@ -36,6 +38,7 @@ public class WebSftpServiceImpl implements WebSftpService {
 
     private Logger logger = LoggerFactory.getLogger(WebSftpServiceImpl.class);
 
+    private static final ExecutorService SINGLE = Executors.newSingleThreadExecutor();
 
     @Override
     public void close(Channel channel) {
@@ -83,10 +86,12 @@ public class WebSftpServiceImpl implements WebSftpService {
             byte[] bytes = IOUtils.toByteArray(new FileInputStream(filePath));
             input = new ByteArrayInputStream(bytes);
             channel.put(input, name);
+            SINGLE.execute(() -> this.deleteLocalFile(filePath));
         } catch (Exception e) {
             logger.error("发送文件时有异常!",e);
         } finally {
             try {
+
                 if (null != input) {
                     input.close();
                 }
@@ -95,6 +100,14 @@ public class WebSftpServiceImpl implements WebSftpService {
             } catch (Exception e) {
                 logger.error("关闭文件时出错!",e);
             }
+        }
+    }
+
+    private void deleteLocalFile(String filePath) {
+        try {
+            Files.deleteIfExists(Paths.get(filePath));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

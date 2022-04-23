@@ -94,6 +94,11 @@
                 term.write("\rconnection closed");
             },
             onData: function (data) {
+                console.log(data)
+                if (data == '\r\nlogout\r\n') {
+                    // 退出
+                    window.location.href='/';
+                }
                 //收到数据时回调
                 term.write(data);
 

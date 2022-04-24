@@ -28,7 +28,6 @@
 <script>
 
     var obj = getParam();
-
     function getParam() {
         return {
             username: $("input[name=username]").val(),
@@ -68,7 +67,7 @@
         //在页面上显示连接中...
         term.write('Connecting...');
 
-        client.setHost($('input[name=address]').val())
+        client.setHost(window.location.host)
         //执行连接操作
         client.connect({
             onError: function (error) {

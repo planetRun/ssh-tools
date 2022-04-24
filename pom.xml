@@ -31,6 +31,10 @@
             <artifactId>jsch</artifactId>
             <version>0.1.54</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
         <!-- WebSocket 支持 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

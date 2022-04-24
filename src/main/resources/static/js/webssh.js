@@ -1,14 +1,20 @@
 function WSSHClient() {
 };
 
+var globalHost;
+
 WSSHClient.prototype._generateEndpoint = function () {
     if (window.location.protocol == 'https:') {
         var protocol = 'wss://';
     } else {
         var protocol = 'ws://';
     }
-    var endpoint = protocol+'127.0.0.1:8080/webssh';
+    var endpoint = protocol+ globalHost + '/webssh';
     return endpoint;
+};
+
+WSSHClient.prototype.setHost = function (host) {
+    globalHost = host;
 };
 
 WSSHClient.prototype.connect = function (options) {

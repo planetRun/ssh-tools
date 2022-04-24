@@ -22,7 +22,7 @@ public class LoginController {
 
 
     @RequestMapping("login")
-    public String login() {
+    public String login(HttpServletResponse response) {
         return "login";
     }
 

@@ -1,5 +1,6 @@
 package cn.objectspace.webssh.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -14,6 +15,10 @@ import javax.servlet.http.HttpSession;
 @Controller
 public class RouterController {
 
+    @Value("${websocket.address}")
+    private String address;
+
+
     @RequestMapping("/websshpage")
     public String websshpage(@RequestParam(required = false) String ipnet,
                              @RequestParam(required = false) String port,
@@ -24,7 +29,7 @@ public class RouterController {
         model.addAttribute("username", username);
         model.addAttribute("password", password);
         model.addAttribute("ipnet", ipnet);
-
+        model.addAttribute("address", address);
         return "webssh";
     }
 }

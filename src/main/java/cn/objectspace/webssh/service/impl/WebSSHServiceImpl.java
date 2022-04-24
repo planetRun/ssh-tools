@@ -1,6 +1,7 @@
 package cn.objectspace.webssh.service.impl;
 
 import cn.objectspace.webssh.constant.ConstantPool;
+import cn.objectspace.webssh.context.FileTransferContext;
 import cn.objectspace.webssh.pojo.SSHConnectInfo;
 import cn.objectspace.webssh.pojo.WebSSHData;
 import cn.objectspace.webssh.service.WebSSHService;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -38,10 +40,16 @@ public class WebSSHServiceImpl implements WebSSHService {
 
     private Logger logger = LoggerFactory.getLogger(WebSSHServiceImpl.class);
     //线程池
-    private ExecutorService executorService = Executors.newCachedThreadPool();
+    private ExecutorService executorService = Executors.newFixedThreadPool(20);
 
     @Autowired
     private WebSftpService webSftpService;
+
+    @Autowired
+    private LogHandle logHandle;
+
+    @Autowired
+    private FileTransferContext fileTransferContext;
 
     /**
      * @Description: 初始化连接
@@ -112,8 +120,7 @@ public class WebSSHServiceImpl implements WebSSHService {
                 try {
                     // 文件上传命令
                     if (command.startsWith("\rfile")) {
-                        ChannelSftp channel = webSftpService.connectToFtpSSH(sshConnectInfo, sshConnectInfo.getWebSSHData());
-                        webSftpService.writeFile(command, "/home", channel);
+                        fileTransferContext.transfer(sshConnectInfo, "sftp", command);
                     } else {
                         transToSSH(sshConnectInfo.getChannel(), command);
                     }

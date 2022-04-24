@@ -66,11 +66,12 @@ $("#terminal").on({
             $(res).each((e, value) => {
                 dropClient.sendClientData("\rfile:"+value);
                 dropClient.sendClientData("\r");
-                dropClient.sendClientData("\rll /home");
+                dropClient.sendClientData("\rll");
                 dropClient.sendClientData("\r");
             })
 
             console.log('回调成功', res)
+            layer.msg('上传成功')
         }
     }
 })

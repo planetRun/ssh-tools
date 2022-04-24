@@ -17,27 +17,16 @@
 <input type="hidden" th:value="${username}" name="username">
 <input type="hidden" th:value="${port}" name="port">
 <input type="hidden" th:value="${password}" name="password">
-
-<script src="../../static/js/drop.js" charset="utf-8"></script>
+<input type="hidden" th:value="${address}" name="address">
+<div class="layui-row">
+    <div class="layui-col-sm12 layui-col-md12 zyl_center zyl_mar_01">
+        © 2022 - xxxx 登陆界面版权所有
+    </div>
+</div>
+<script src="/static/js/drop.js" charset="utf-8"></script>
+<script src="/static/js/js.cookie.js" charset="utf-8"></script>
 <script>
 
-    //    function getParam() {
-    //        let url = window.location.href;//http://localhost:3000/edu/edu_teacher?type=2&a=3
-    //        if(url.indexOf('?') != -1){
-    //            let obj = {};
-    //            let arr = url.slice(url.indexOf('?')+1).split('&');
-    //            arr.forEach(item => {
-    //                let param = item.split('=');
-    //                obj[param[0]] = param[1];
-    //            })
-    //            console.log(obj);
-    //            return obj;
-    //        }else {
-    //            console.log('没有参数');
-    //            alert('没有参数');
-    //            return null;
-    //        }
-    //    }
     var obj = getParam();
 
     function getParam() {
@@ -61,12 +50,12 @@
     function openTerminal(options) {
         var client = new WSSHClient();
         var term = new Terminal({
-            cols: 97,
-            rows: 37,
+            cols: 200,
+            rows: 50,
             cursorBlink: true, // 光标闪烁
             cursorStyle: "block", // 光标样式  null | 'block' | 'underline' | 'bar'
             scrollback: 800, //回滚
-            tabStopWidth: 8, //制表宽度
+            tabStopWidth: 10, //制表宽度
             screenKeys: true
         });
 
@@ -74,9 +63,12 @@
             //键盘输入时的回调函数
             client.sendClientData(data);
         });
+
         term.open(document.getElementById('terminal'));
         //在页面上显示连接中...
         term.write('Connecting...');
+
+        client.setHost($('input[name=address]').val())
         //执行连接操作
         client.connect({
             onError: function (error) {
@@ -96,6 +88,8 @@
             onData: function (data) {
                 console.log(data)
                 if (data == '\r\nlogout\r\n') {
+                    Cookies.remove('password');
+                    Cookies.remove('username');
                     // 退出
                     window.location.href='/';
                 }

@@ -16,16 +16,16 @@ public class SSHConnectInfo {
     /**
      * 当前文件夹路径  上传文件用
      */
-    private String curDirPath;
+    private String remotePath = "/root";
 
     private WebSSHData webSSHData;
 
-    public String getCurDirPath() {
-        return curDirPath;
+    public String getRemotePath() {
+        return remotePath;
     }
 
-    public void setCurDirPath(String curDirPath) {
-        this.curDirPath = curDirPath;
+    public void setRemotePath(String remotePath) {
+        this.remotePath = remotePath;
     }
 
     public WebSSHData getWebSSHData() {
